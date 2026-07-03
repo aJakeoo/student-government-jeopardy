@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CCS Student Government Jeopardy — Buzz In</title>
+<link rel="icon" href="assets/img/peacock-logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@700;800&family=Libre+Franklin:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buzzer.css">
+</head>
+<body>
+<div class="buzzer-root">
+  <div class="phone">
+
+    <div class="phone__status">
+      <span class="phone__name" id="statusName"></span>
+      <span class="phone__score" id="statusScore"></span>
+    </div>
+
+    <!-- Name entry -->
+    <div class="join-screen" id="joinScreen">
+      <div class="join-screen__title">Join the game</div>
+      <input class="join-screen__input" id="nameInput" placeholder="Your name..." maxlength="24" autocomplete="off">
+      <button class="join-screen__button" id="joinButton">JOIN</button>
+    </div>
+
+    <!-- Game screen -->
+    <div class="game-screen" id="gameScreen" hidden>
+      <div class="game-screen__header">
+        <div class="game-screen__brand">CCS Student Gov</div>
+        <div class="game-screen__title">JEOPARDY!</div>
+      </div>
+
+      <div class="value-indicator" id="valueIndicator">
+        <span class="value-indicator__value" id="valueDisplay" hidden></span>
+        <span class="value-indicator__waiting" id="waitingDisplay">Waiting for host...</span>
+      </div>
+
+      <div class="buzz-area">
+        <button class="buzz-button" id="buzzButton">
+          <span class="buzz-button__line1">BUZZ</span>
+          <span class="buzz-button__line2">IN</span>
+        </button>
+        <div class="buzz-status" id="buzzStatus"></div>
+      </div>
+
+      <div class="leaderboard">
+        <div class="leaderboard__title">Leaderboard</div>
+        <div id="leaderboardList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="back-link" id="backLink">← Host board</button>
+</div>
+
+<script type="module" src="js/buzzer.js"></script>
+</body>
+</html>

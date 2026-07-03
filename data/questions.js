@@ -5,7 +5,7 @@
 // `empty: true` so the host board can visibly skip/grey them out
 // instead of silently pretending there's content.
 
-const CATEGORIES = [
+export const CATEGORIES = [
   {
     name: 'Elections &\nNominations',
     clues: [

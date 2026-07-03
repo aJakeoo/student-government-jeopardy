@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// CCS Student Government Jeopardy — single shared room, no auth.
+// There is exactly one document this app ever touches: rooms/main.
+// Anyone with the link can read/write it, same as anyone in the room
+// can grab the projector remote — acceptable for a live, host-supervised
+// training game with no accounts and no persistence requirement.
+// Everything else is denied by default.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/main {
+      allow read, write: if true;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,296 @@
+/* Buzzer — phone screen, thumb-friendly. */
+
+.buzzer-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(155deg, #1a1a2e 0%, #242460 100%);
+  gap: 14px;
+  padding: 20px;
+}
+
+.phone {
+  width: min(88vw, 390px);
+  height: min(82vh, 720px);
+  background: var(--color-tile-unrevealed);
+  border-radius: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone__status {
+  height: 50px;
+  background: var(--color-blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.phone__name {
+  font-size: 14px;
+  font-weight: 900;
+  color: white;
+  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+}
+
+.phone__score {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-yellow);
+  font-weight: 700;
+}
+
+/* Name entry */
+.join-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 28px;
+}
+
+.join-screen[hidden] {
+  display: none;
+}
+
+.join-screen__title {
+  font-family: var(--font-callout);
+  font-size: 22px;
+  color: var(--color-blue);
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.join-screen__input {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 2px solid var(--color-purple);
+  background: white;
+  color: #333;
+  font-size: 16px;
+  font-family: var(--font-body);
+  text-align: center;
+  width: 100%;
+  outline: none;
+}
+
+.join-screen__button {
+  background: var(--color-purple);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 0;
+  width: 100%;
+  font-family: var(--font-callout);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.join-screen__button:active {
+  transform: scale(0.96);
+}
+
+/* Game screen */
+.game-screen[hidden] {
+  display: none;
+}
+
+.game-screen__header {
+  padding: 18px 24px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.game-screen__brand {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--color-blue);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.game-screen__title {
+  font-family: var(--font-callout);
+  font-size: 20px;
+  color: var(--color-blue);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+.value-indicator {
+  padding: 10px 24px;
+  text-align: center;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.value-indicator__value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--color-purple);
+  font-weight: 700;
+}
+
+.value-indicator__waiting {
+  font-size: 13px;
+  color: #bbb;
+  font-weight: 500;
+}
+
+.buzz-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  gap: 18px;
+}
+
+.buzz-button {
+  width: 100%;
+  height: 210px;
+  border: none;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  background: #d0d0d0;
+  color: white;
+  cursor: default;
+  opacity: 0.38;
+}
+
+.buzz-button:active {
+  transform: scale(0.93);
+}
+
+.buzz-button--active {
+  background: var(--color-purple);
+  cursor: pointer;
+  opacity: 1;
+  box-shadow: 0 8px 28px rgba(183, 143, 214, 0.55);
+  animation: pulse 1.8s ease infinite;
+}
+
+.buzz-button--won {
+  background: var(--color-yellow);
+  color: var(--color-bg);
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.buzz-button--lost {
+  background: var(--color-red-light);
+  color: var(--color-bg);
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.buzz-button__line1 {
+  font-family: var(--font-callout);
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.buzz-button__line2 {
+  font-family: var(--font-callout);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.buzz-status {
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  min-height: 22px;
+  letter-spacing: 0.02em;
+  color: #ccc;
+}
+
+.buzz-status--won {
+  color: var(--color-green-text);
+}
+
+.buzz-status--lost {
+  color: var(--color-red-text);
+}
+
+.buzz-status--active {
+  color: var(--color-purple);
+}
+
+.leaderboard {
+  padding: 14px 24px 28px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.leaderboard__title {
+  font-size: 10px;
+  color: #bbb;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.leaderboard__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.leaderboard__name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.leaderboard__score {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--color-blue);
+  font-weight: 700;
+}
+
+.back-link {
+  color: rgba(255, 255, 255, 0.32);
+  background: none;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+
+.back-link:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
