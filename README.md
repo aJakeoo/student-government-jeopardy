@@ -28,9 +28,13 @@ flags can come out at the same time.
 2. Publish `firestore.rules` (Firestore → Rules tab, or `firebase deploy
    --only firestore:rules` with the Firebase CLI). Without this the app
    can't read/write the room document.
-3. That's it — no Auth, no other products. One document
-   (`rooms/main`) holds all game state and resets whenever it's deleted;
-   there's no cross-session persistence by design.
+3. That's it — no Auth, no other products. `rooms/main` holds the board
+   state (`currentTile`, `buzzLock`, answered tiles) and a `players`
+   subcollection (one doc per device, keyed by a random id generated on
+   first visit to `buzzer.html` — not by name, so two players who share a
+   first name still get separate scores). Deleting `rooms/main` and its
+   `players` subcollection resets the game; there's no cross-session
+   persistence by design.
 
 ## Running locally
 

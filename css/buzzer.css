@@ -280,17 +280,3 @@
   color: var(--color-blue);
   font-weight: 700;
 }
-
-.back-link {
-  color: rgba(255, 255, 255, 0.32);
-  background: none;
-  border: none;
-  font-size: 13px;
-  cursor: pointer;
-  letter-spacing: 0.05em;
-  transition: color 0.15s;
-}
-
-.back-link:hover {
-  color: rgba(255, 255, 255, 0.6);
-}

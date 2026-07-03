@@ -2,12 +2,12 @@ import { CATEGORIES } from '../data/questions.js';
 import {
   ensureRoom,
   subscribeRoom,
+  subscribePlayers,
   openQuestion,
   openBuzzer,
   revealAnswer,
   markResult,
   closeQuestion,
-  simulateBuzz,
   boardKey,
 } from './room.js';
 
@@ -32,9 +32,11 @@ const waitingHint = document.getElementById('waitingHint');
 const btnCorrect = document.getElementById('btnCorrect');
 const btnIncorrect = document.getElementById('btnIncorrect');
 const btnSkip = document.getElementById('btnSkip');
-const btnSimBuzz = document.getElementById('btnSimBuzz');
 const btnReveal = document.getElementById('btnReveal');
 const btnClose = document.getElementById('btnClose');
+
+let latestRoom = null;
+let latestPlayers = {};
 
 function fmt(n) {
   const v = n ?? 0;
@@ -101,10 +103,10 @@ function renderBoard(room) {
   }
 }
 
-function renderScores(room) {
+function renderScores(players) {
   scoreBar.innerHTML = '';
-  const entries = Object.entries(room.scores).sort(([, a], [, b]) => b - a);
-  entries.forEach(([name, score]) => {
+  const entries = Object.values(players).sort((a, b) => (b.score || 0) - (a.score || 0));
+  entries.forEach(({ name, score }) => {
     const chip = document.createElement('div');
     chip.className = 'score-chip';
     const nameEl = document.createElement('span');
@@ -119,16 +121,16 @@ function renderScores(room) {
   });
 }
 
-function renderQuestion(room) {
-  const { activeQuestion, questionPhase, buzzedBy } = room;
+function renderQuestion(room, players) {
+  const tile = room.currentTile;
 
-  if (!activeQuestion) {
+  if (!tile) {
     questionOverlay.hidden = true;
     return;
   }
   questionOverlay.hidden = false;
 
-  const { catIdx, rowIdx } = activeQuestion;
+  const { catIdx, rowIdx, phase } = tile;
   const cat = CATEGORIES[catIdx];
   const clue = cat.clues[rowIdx];
 
@@ -137,19 +139,27 @@ function renderQuestion(room) {
   aqQuestion.textContent = clue.question || '';
   aqAnswer.textContent = clue.answer || '';
 
-  feather.classList.toggle('show', questionPhase === 'feather');
-  questionContent.classList.toggle('show', questionPhase === 'question' || questionPhase === 'answer');
+  feather.classList.toggle('show', phase === 'feather');
+  questionContent.classList.toggle('show', phase === 'question' || phase === 'answer');
 
-  buzzBanner.hidden = !buzzedBy;
-  if (buzzedBy) buzzBanner.textContent = `${buzzedBy} BUZZES IN!`;
+  const buzzedName = room.buzzLock ? (players[room.buzzLock] && players[room.buzzLock].name) : null;
+  buzzBanner.hidden = !buzzedName;
+  if (buzzedName) buzzBanner.textContent = `${buzzedName} BUZZES IN!`;
 
-  const showAnswer = questionPhase === 'answer';
-  const showPreAnswer = questionPhase === 'question';
+  const showAnswer = phase === 'answer';
+  const showPreAnswer = phase === 'question';
 
   answerBox.hidden = !showAnswer;
   answerControls.hidden = !showAnswer;
   preAnswerControls.hidden = !showPreAnswer;
   waitingHint.hidden = !showPreAnswer;
+}
+
+function renderAll() {
+  if (!latestRoom) return;
+  renderBoard(latestRoom);
+  renderScores(latestPlayers);
+  renderQuestion(latestRoom, latestPlayers);
 }
 
 // ---- Host actions ----
@@ -163,14 +173,16 @@ async function handleOpenQuestion(catIdx, rowIdx) {
 btnCorrect.addEventListener('click', () => markResult('correct'));
 btnIncorrect.addEventListener('click', () => markResult('incorrect'));
 btnSkip.addEventListener('click', () => markResult('skipped'));
-btnSimBuzz.addEventListener('click', () => simulateBuzz());
 btnReveal.addEventListener('click', () => revealAnswer());
 btnClose.addEventListener('click', () => closeQuestion());
 
 // ---- Boot ----
 await ensureRoom();
 subscribeRoom((room) => {
-  renderBoard(room);
-  renderScores(room);
-  renderQuestion(room);
+  latestRoom = room;
+  renderAll();
+});
+subscribePlayers((players) => {
+  latestPlayers = players;
+  renderAll();
 });

@@ -1,6 +1,7 @@
-import { ensureRoom, subscribeRoom, joinRoom, buzzIn } from './room.js';
+import { ensureRoom, subscribeRoom, subscribePlayers, joinRoom, buzzIn } from './room.js';
 
 const NAME_KEY = 'ccsSgJeopardyName';
+const PLAYER_ID_KEY = 'ccsSgJeopardyPlayerId';
 
 const statusName = document.getElementById('statusName');
 const statusScore = document.getElementById('statusScore');
@@ -15,15 +16,33 @@ const waitingDisplay = document.getElementById('waitingDisplay');
 const buzzButton = document.getElementById('buzzButton');
 const buzzStatus = document.getElementById('buzzStatus');
 const leaderboardList = document.getElementById('leaderboardList');
-const backLink = document.getElementById('backLink');
 
 function fmt(n) {
   const v = n ?? 0;
   return v >= 0 ? `$${v}` : `-$${Math.abs(v)}`;
 }
 
-let playerName = sessionStorage.getItem(NAME_KEY) || '';
+function generatePlayerId() {
+  // crypto.randomUUID() needs a secure context (HTTPS/localhost) and
+  // throws on plain-HTTP LAN testing, so fall back to a Math.random id —
+  // this only needs to be unique per device, not cryptographically strong.
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+// Persistent per-device identity, survives refresh/tab close so a
+// player's score stays theirs even if their phone browser gets killed.
+let playerId = localStorage.getItem(PLAYER_ID_KEY);
+if (!playerId) {
+  playerId = generatePlayerId();
+  localStorage.setItem(PLAYER_ID_KEY, playerId);
+}
+
+let playerName = localStorage.getItem(NAME_KEY) || '';
 let latestRoom = null;
+let latestPlayers = {};
 
 function showScreenForState() {
   const hasName = !!playerName;
@@ -35,8 +54,8 @@ async function doJoin() {
   const n = nameInput.value.trim();
   if (!n) return;
   playerName = n;
-  sessionStorage.setItem(NAME_KEY, n);
-  await joinRoom(n);
+  localStorage.setItem(NAME_KEY, n);
+  await joinRoom(playerId, n);
   showScreenForState();
 }
 
@@ -45,25 +64,26 @@ nameInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') doJoin();
 });
 
-backLink.addEventListener('click', () => {
-  window.location.href = 'index.html';
-});
-
 buzzButton.addEventListener('click', () => {
-  if (!latestRoom || !latestRoom.buzzerOpen || latestRoom.buzzedBy) return;
-  buzzIn(playerName, latestRoom.buzzToken);
+  if (!latestRoom) return;
+  const tile = latestRoom.currentTile;
+  if (!tile || tile.phase !== 'question' || latestRoom.buzzLock) return;
+  buzzIn(playerId, latestRoom.buzzToken);
 });
 
-function render(room) {
-  latestRoom = room;
+function render() {
+  if (!latestRoom) return;
+  const room = latestRoom;
+  const players = latestPlayers;
+  const me = players[playerId];
 
   statusName.textContent = playerName;
-  statusScore.textContent = fmt(room.scores[playerName]);
+  statusScore.textContent = fmt(me && me.score);
 
-  const hasActiveQ = !!room.activeQuestion;
+  const tile = room.currentTile;
+  const hasActiveQ = !!tile;
   if (hasActiveQ) {
-    const { catIdx, rowIdx } = room.activeQuestion;
-    const value = (rowIdx + 1) * 100;
+    const value = (tile.rowIdx + 1) * 100;
     valueDisplay.textContent = `$${value}`;
     valueDisplay.hidden = false;
     waitingDisplay.hidden = true;
@@ -72,9 +92,10 @@ function render(room) {
     waitingDisplay.hidden = false;
   }
 
-  const buzzedSelf = room.buzzedBy === playerName;
-  const buzzedOther = !!room.buzzedBy && !buzzedSelf;
-  const buzzerActive = room.buzzerOpen && !room.buzzedBy;
+  const buzzedSelf = room.buzzLock === playerId;
+  const buzzedOther = !!room.buzzLock && !buzzedSelf;
+  const buzzerActive = !!tile && tile.phase === 'question' && !room.buzzLock;
+  const buzzedOtherName = buzzedOther && players[room.buzzLock] ? players[room.buzzLock].name : 'Someone';
 
   buzzButton.classList.remove('buzz-button--active', 'buzz-button--won', 'buzz-button--lost');
   if (buzzedSelf) {
@@ -92,7 +113,7 @@ function render(room) {
     buzzStatus.textContent = '🎉 You buzzed first!';
   } else if (buzzedOther) {
     buzzStatus.classList.add('buzz-status--lost');
-    buzzStatus.textContent = `${room.buzzedBy} got there first`;
+    buzzStatus.textContent = `${buzzedOtherName} got there first`;
   } else if (buzzerActive) {
     buzzStatus.classList.add('buzz-status--active');
     buzzStatus.textContent = 'Tap to buzz in!';
@@ -103,9 +124,9 @@ function render(room) {
   }
 
   leaderboardList.innerHTML = '';
-  Object.entries(room.scores)
-    .sort(([, a], [, b]) => b - a)
-    .forEach(([name, score]) => {
+  Object.values(players)
+    .sort((a, b) => (b.score || 0) - (a.score || 0))
+    .forEach(({ name, score }) => {
       const row = document.createElement('div');
       row.className = 'leaderboard__row';
       const nameEl = document.createElement('span');
@@ -123,6 +144,13 @@ function render(room) {
 showScreenForState();
 await ensureRoom();
 if (playerName) {
-  await joinRoom(playerName);
+  await joinRoom(playerId, playerName);
 }
-subscribeRoom(render);
+subscribeRoom((room) => {
+  latestRoom = room;
+  render();
+});
+subscribePlayers((players) => {
+  latestPlayers = players;
+  render();
+});
