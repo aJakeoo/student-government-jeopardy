@@ -165,3 +165,58 @@ already enabled and live at
 — no manual Pages setup needed. GitHub Pages rebuilds typically land
 within a minute or two of a push, so allow a short delay before the
 `playerId`/subcollection fix is live if you check immediately.
+
+## Host-presence / game-session reset — 2026-07-03
+
+Requested feature: the host board is the game's "anchor" — whenever it's
+closed or refreshed, the whole game should reset and every buzzer should
+get kicked out until a new game starts.
+
+Firestore has no server-side disconnect hook (that's an RTDB-only
+feature — `onDisconnect()` doesn't exist here), so this is built as a
+heartbeat/session pattern instead of trying to catch the tab-close event
+directly:
+
+- `rooms/main` gains `hostSessionId` (random, regenerated every time
+  `index.html` loads) and `hostLastSeen` (a plain `Date.now()` timestamp,
+  not `serverTimestamp()` — avoids the "pending write reads as null"
+  gap that would otherwise show on the host's own snapshot).
+- `js/room.js`: new `startHostSession()` — called once on host boot,
+  batch-deletes every doc in `players/` and resets the room doc with a
+  fresh session id in one atomic batch. New `sendHostHeartbeat()`, called
+  every `HOST_HEARTBEAT_MS` (4s) from `host.js` via `setInterval` for as
+  long as the tab stays open. New `isHostActive(room)` — true only if
+  `hostLastSeen` is newer than `HOST_TIMEOUT_MS` (10s) old.
+- `js/host.js`: boot now calls `startHostSession()` instead of the old
+  `ensureRoom()` (which only created the doc if missing — now every load
+  unconditionally resets), and starts the heartbeat interval.
+- `js/buzzer.js`: tracks the last `hostSessionId` it knew about in
+  `localStorage`. On every room update: if the session id changed (host
+  started a new game), the player's local name is cleared and they're
+  sent back to name entry. Independently, if `isHostActive()` is false
+  (host tab closed, no heartbeat for 10s+) a new "Waiting for the host"
+  screen takes over from both the join screen and the game screen, and
+  they can't join or buzz until it comes back. A player's own page
+  refresh, while the same host session is still active, still silently
+  resumes as themself (no forced re-entry) — only an actual new game
+  forces a fresh name entry.
+- `buzzer.html`/`css/buzzer.css`: added the `#hostGoneScreen` block for
+  the above.
+
+Known limitation: since this relies on a heartbeat rather than an
+instant disconnect signal, there's up to ~10s of lag between the host
+tab actually closing and buzzers flipping to "waiting for host" — an
+immediate kick would need Firebase Realtime Database or a Cloud
+Function, which is a much bigger change than this task called for. A
+host *refresh* resets instantly (the new page load wipes everything
+before it renders anything), so the lag only applies to the
+close-without-reopening case.
+
+Per instruction, skipped the live browser QA loop for this change (JS
+syntax-checked with `node --check`, greped for dangling references to
+the removed `ensureRoom` — clean) to get it committed before the usage
+window closed. Recommend a quick manual pass next session: open the
+host board, open a buzzer tab and join, close the host tab, confirm the
+buzzer flips to "Waiting for the host" within ~10s, then reopen the host
+board and confirm the buzzer is forced back to name entry with a clean
+board.

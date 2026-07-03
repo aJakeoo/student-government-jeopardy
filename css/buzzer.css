@@ -47,6 +47,38 @@
   font-weight: 700;
 }
 
+/* Shown while no host board is open */
+.host-gone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 28px;
+  text-align: center;
+}
+
+.host-gone[hidden] {
+  display: none;
+}
+
+.host-gone__title {
+  font-family: var(--font-callout);
+  font-size: 20px;
+  color: var(--color-blue);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.host-gone__sub {
+  font-size: 13px;
+  color: #999;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 /* Name entry */
 .join-screen {
   flex: 1;

@@ -1,6 +1,8 @@
 import { CATEGORIES } from '../data/questions.js';
 import {
-  ensureRoom,
+  startHostSession,
+  sendHostHeartbeat,
+  HOST_HEARTBEAT_MS,
   subscribeRoom,
   subscribePlayers,
   openQuestion,
@@ -177,7 +179,14 @@ btnReveal.addEventListener('click', () => revealAnswer());
 btnClose.addEventListener('click', () => closeQuestion());
 
 // ---- Boot ----
-await ensureRoom();
+// The host board is the game's anchor: every load (first open, refresh,
+// or reopening after being closed) starts a fresh session — wipes all
+// players and resets the board so there's never a stale half-played game
+// or leftover players sitting in the room from before.
+await startHostSession();
+const heartbeatTimer = setInterval(sendHostHeartbeat, HOST_HEARTBEAT_MS);
+window.addEventListener('beforeunload', () => clearInterval(heartbeatTimer));
+
 subscribeRoom((room) => {
   latestRoom = room;
   renderAll();

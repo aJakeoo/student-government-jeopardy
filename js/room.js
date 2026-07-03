@@ -14,35 +14,74 @@ import { db } from './firebase-config.js';
 import {
   collection,
   doc,
+  getDocs,
   onSnapshot,
   runTransaction,
   updateDoc,
   setDoc,
+  writeBatch,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 const ROOM_REF = doc(db, 'rooms', 'main');
 const PLAYERS_COL = collection(db, 'rooms', 'main', 'players');
+
+// A host is only "live" while its tab is open and heartbeating — Firestore
+// has no server-side disconnect hook (that's an RTDB-only feature), so
+// presence is approximated: the host writes hostLastSeen on an interval,
+// and anyone reading the room treats it as stale (host gone) once it's
+// older than this. Plain client Date.now() (not serverTimestamp()) so a
+// reader never has to deal with the "pending write shows null" gap.
+export const HOST_HEARTBEAT_MS = 4000;
+export const HOST_TIMEOUT_MS = 10000;
 
 export const DEFAULT_ROOM = {
   board: {},
   currentTile: null,
   buzzLock: null,
   buzzToken: 0,
+  hostSessionId: null,
+  hostLastSeen: null,
 };
 
 export function boardKey(catIdx, rowIdx) {
   return `c${catIdx}r${rowIdx}`;
 }
 
-// Ensures rooms/main exists. Safe to call from both pages on load —
-// only creates the doc if it's genuinely missing, never clobbers state.
-export async function ensureRoom() {
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ROOM_REF);
-    if (!snap.exists()) {
-      tx.set(ROOM_REF, DEFAULT_ROOM);
-    }
+export function isHostActive(room) {
+  return !!(
+    room &&
+    room.hostSessionId &&
+    room.hostLastSeen &&
+    Date.now() - room.hostLastSeen < HOST_TIMEOUT_MS
+  );
+}
+
+function generateSessionId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+// The host board is the game's anchor: every time it loads (first open,
+// manual refresh, or reopening after being closed) it starts a brand new
+// session — wipes every player doc and resets the board/buzzer state, so
+// there's no stale "half-answered" game sitting around and no leftover
+// players from whoever was in the room before. Buzzer clients detect the
+// new hostSessionId and get bounced back to name entry.
+export async function startHostSession() {
+  const sessionId = generateSessionId();
+  const playersSnap = await getDocs(PLAYERS_COL);
+  const batch = writeBatch(db);
+  playersSnap.forEach((d) => batch.delete(d.ref));
+  batch.set(ROOM_REF, {
+    ...DEFAULT_ROOM,
+    hostSessionId: sessionId,
+    hostLastSeen: Date.now(),
   });
+  await batch.commit();
+  return sessionId;
+}
+
+export async function sendHostHeartbeat() {
+  await updateDoc(ROOM_REF, { hostLastSeen: Date.now() });
 }
 
 export function subscribeRoom(callback) {

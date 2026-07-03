@@ -20,8 +20,14 @@
       <span class="phone__score" id="statusScore"></span>
     </div>
 
+    <!-- Shown while no host board is open -->
+    <div class="host-gone" id="hostGoneScreen" hidden>
+      <div class="host-gone__title">Waiting for the host</div>
+      <div class="host-gone__sub">The game hasn't started yet — this updates automatically once the host opens the board.</div>
+    </div>
+
     <!-- Name entry -->
-    <div class="join-screen" id="joinScreen">
+    <div class="join-screen" id="joinScreen" hidden>
       <div class="join-screen__title">Join the game</div>
       <input class="join-screen__input" id="nameInput" placeholder="Your name..." maxlength="24" autocomplete="off">
       <button class="join-screen__button" id="joinButton">JOIN</button>

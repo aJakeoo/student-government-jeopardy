@@ -1,11 +1,13 @@
-import { ensureRoom, subscribeRoom, subscribePlayers, joinRoom, buzzIn } from './room.js';
+import { subscribeRoom, subscribePlayers, joinRoom, buzzIn, isHostActive } from './room.js';
 
 const NAME_KEY = 'ccsSgJeopardyName';
 const PLAYER_ID_KEY = 'ccsSgJeopardyPlayerId';
+const HOST_SESSION_KEY = 'ccsSgJeopardyHostSession';
 
 const statusName = document.getElementById('statusName');
 const statusScore = document.getElementById('statusScore');
 
+const hostGoneScreen = document.getElementById('hostGoneScreen');
 const joinScreen = document.getElementById('joinScreen');
 const nameInput = document.getElementById('nameInput');
 const joinButton = document.getElementById('joinButton');
@@ -41,22 +43,32 @@ if (!playerId) {
 }
 
 let playerName = localStorage.getItem(NAME_KEY) || '';
+// Which host game session this device last joined/knows about — used to
+// detect "the host started a new game" vs. "my own page just refreshed
+// mid-game", which need different treatment (rejoin from scratch vs.
+// silently resume).
+let knownHostSessionId = localStorage.getItem(HOST_SESSION_KEY) || null;
+let hasJoinedThisSession = false;
 let latestRoom = null;
 let latestPlayers = {};
 
-function showScreenForState() {
+function showScreenForState(hostActive) {
   const hasName = !!playerName;
-  joinScreen.hidden = hasName;
-  gameScreen.hidden = !hasName;
+  hostGoneScreen.hidden = hostActive;
+  joinScreen.hidden = !hostActive || hasName;
+  gameScreen.hidden = !hostActive || !hasName;
 }
 
 async function doJoin() {
   const n = nameInput.value.trim();
-  if (!n) return;
+  if (!n || !latestRoom) return;
   playerName = n;
   localStorage.setItem(NAME_KEY, n);
-  await joinRoom(playerId, n);
-  showScreenForState();
+  knownHostSessionId = latestRoom.hostSessionId;
+  localStorage.setItem(HOST_SESSION_KEY, knownHostSessionId || '');
+  await joinRoom(playerId, playerName);
+  hasJoinedThisSession = true;
+  showScreenForState(isHostActive(latestRoom));
 }
 
 joinButton.addEventListener('click', doJoin);
@@ -75,6 +87,28 @@ function render() {
   if (!latestRoom) return;
   const room = latestRoom;
   const players = latestPlayers;
+
+  // The host board wiped everyone and started fresh — anyone who was
+  // playing under the old session gets bounced back to name entry.
+  if (room.hostSessionId !== knownHostSessionId) {
+    knownHostSessionId = room.hostSessionId;
+    localStorage.setItem(HOST_SESSION_KEY, knownHostSessionId || '');
+    playerName = '';
+    hasJoinedThisSession = false;
+    localStorage.removeItem(NAME_KEY);
+  }
+
+  const hostActive = isHostActive(room);
+  showScreenForState(hostActive);
+  if (!hostActive) return;
+
+  // Re-establish our player doc once per session (covers this device's
+  // own page refresh while the same game is still running).
+  if (playerName && !hasJoinedThisSession) {
+    hasJoinedThisSession = true;
+    joinRoom(playerId, playerName);
+  }
+
   const me = players[playerId];
 
   statusName.textContent = playerName;
@@ -141,11 +175,7 @@ function render() {
     });
 }
 
-showScreenForState();
-await ensureRoom();
-if (playerName) {
-  await joinRoom(playerId, playerName);
-}
+showScreenForState(false);
 subscribeRoom((room) => {
   latestRoom = room;
   render();
