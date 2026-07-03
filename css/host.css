@@ -1,0 +1,482 @@
+/* Host board — projector display, not responsive by design. */
+
+.host-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Score bar */
+.score-bar {
+  height: 58px;
+  background: var(--color-blue);
+  border-bottom: 4px solid var(--color-yellow);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.score-bar__title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  white-space: nowrap;
+  margin-right: 6px;
+}
+
+.score-bar__brand {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: white;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.score-bar__game {
+  font-family: var(--font-callout);
+  font-size: 21px;
+  color: var(--color-yellow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.score-bar__scores {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.score-chip {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 6px;
+  padding: 3px 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.score-chip__name {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.score-chip__value {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--color-yellow);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.buzzer-view-link {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.buzzer-view-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Board grid */
+.board-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 88px repeat(5, 1fr);
+  gap: 3px;
+  padding: 3px;
+  min-height: 0;
+  background: var(--color-bg-grid);
+}
+
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-blue);
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.board-header__label {
+  font-family: var(--font-display);
+  font-size: clamp(12px, 1.4vw, 19px);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: pre-wrap;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-tile-border);
+  background: var(--color-tile-unrevealed);
+  transition: all 0.18s;
+  cursor: pointer;
+}
+
+.tile:hover:not(.tile--answered):not(.tile--empty) {
+  background: #f0ebe0;
+  transform: scale(1.05);
+}
+
+.tile--answered,
+.tile--empty {
+  cursor: default;
+}
+
+.tile--empty {
+  opacity: 0.5;
+}
+
+.tile__label {
+  user-select: none;
+  font-weight: 700;
+}
+
+.tile__label--value {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2.3vw, 42px);
+  letter-spacing: 0.02em;
+  color: #9d5fc0;
+}
+
+.tile__label--result {
+  font-family: sans-serif;
+  font-size: 24px;
+}
+
+.tile--correct {
+  background: var(--color-green-light);
+}
+.tile--correct .tile__label--result {
+  color: var(--color-green-text);
+}
+
+.tile--incorrect {
+  background: var(--color-red-light-2);
+}
+.tile--incorrect .tile__label--result {
+  color: var(--color-red-text);
+}
+
+.tile--skipped {
+  background: var(--color-skip-bg);
+}
+.tile--skipped .tile__label--result {
+  color: var(--color-skip-text);
+}
+
+/* Join footer */
+.join-footer {
+  height: 92px;
+  flex-shrink: 0;
+  background: var(--color-footer);
+  border-top: 2px solid var(--color-bg-grid);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  gap: 16px;
+}
+
+.join-footer__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.join-footer__qr {
+  width: 72px;
+  height: 72px;
+  display: block;
+  border-radius: 8px;
+  border: 3px solid var(--color-purple);
+  background: var(--color-tile-unrevealed);
+}
+
+.join-footer__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.join-footer__headline {
+  font-family: var(--font-callout);
+  font-size: 22px;
+  color: var(--color-yellow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.join-footer__sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+}
+
+.join-footer__logo {
+  height: 76px;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Question overlay */
+.question-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-blue);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 80px;
+  overflow: hidden;
+}
+
+.question-overlay[hidden] {
+  display: none;
+}
+
+.feather {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 62%;
+  width: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s;
+}
+
+.feather.show {
+  opacity: 1;
+  animation: peacockReveal 0.45s ease-out both;
+}
+
+.question-content {
+  width: 100%;
+  max-width: 880px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.35s 0.08s, transform 0.35s 0.08s;
+}
+
+.question-content.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.q-badges {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.q-badge__cat {
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.8vw, 24px);
+  color: rgba(255, 255, 255, 0.62);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.q-badge__value {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2vw, 28px);
+  color: var(--color-purple);
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 3px 16px;
+  border-radius: 100px;
+}
+
+.q-text {
+  font-family: var(--font-body);
+  font-size: clamp(20px, 2.8vw, 42px);
+  font-weight: 900;
+  color: white;
+  line-height: 1.38;
+  text-wrap: pretty;
+  max-width: 820px;
+}
+
+.buzz-banner {
+  background: var(--color-yellow);
+  color: var(--color-bg);
+  font-family: var(--font-callout);
+  font-size: clamp(18px, 2.2vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 10px 28px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  animation: buzzPop 0.38s ease both;
+  align-self: center;
+}
+
+.answer-box {
+  background: rgba(94, 176, 144, 0.18);
+  border-radius: 12px;
+  padding: 20px 28px;
+  border-left: 4px solid var(--color-green);
+  text-align: left;
+  width: 100%;
+  max-width: 820px;
+}
+
+.answer-box__label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.answer-box__text {
+  font-family: var(--font-body);
+  font-size: clamp(17px, 2.3vw, 36px);
+  font-weight: 900;
+  color: var(--color-green);
+  line-height: 1.3;
+}
+
+.q-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* An author rule with `display` always beats the UA [hidden] rule
+   regardless of specificity/order, so it needs an explicit override
+   here or the hidden attribute is silently ignored. */
+.q-controls[hidden] {
+  display: none;
+}
+
+.btn-correct,
+.btn-incorrect,
+.btn-skip,
+.btn-reveal,
+.btn-close,
+.btn-simbuzz {
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-callout);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-correct {
+  background: var(--color-green);
+  color: white;
+  padding: 14px 30px;
+  font-size: clamp(14px, 1.7vw, 21px);
+}
+
+.btn-incorrect {
+  background: var(--color-red);
+  color: white;
+  padding: 14px 30px;
+  font-size: clamp(14px, 1.7vw, 21px);
+}
+
+.btn-skip {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+  padding: 14px 22px;
+  font-size: clamp(14px, 1.7vw, 21px);
+}
+
+.btn-correct:hover,
+.btn-incorrect:hover,
+.btn-skip:hover {
+  transform: scale(1.05);
+}
+
+.btn-simbuzz {
+  background: rgba(255, 255, 255, 0.11);
+  color: rgba(255, 255, 255, 0.82);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  padding: 11px 22px;
+  font-size: clamp(13px, 1.5vw, 18px);
+  font-weight: 400;
+  transition: all 0.15s;
+}
+
+.btn-simbuzz:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-reveal {
+  background: var(--color-yellow);
+  color: var(--color-bg);
+  padding: 11px 26px;
+  font-size: clamp(13px, 1.5vw, 18px);
+}
+
+.btn-reveal:hover {
+  transform: scale(1.04);
+}
+
+.btn-close {
+  background: none;
+  color: rgba(255, 255, 255, 0.38);
+  padding: 11px 18px;
+  font-size: clamp(12px, 1.3vw, 15px);
+  font-weight: 400;
+  transition: color 0.15s;
+  border-radius: 8px;
+}
+
+.btn-close:hover {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.waiting-hint {
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 13px;
+  text-align: center;
+  margin-top: -8px;
+}

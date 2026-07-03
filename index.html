@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CCS Student Government Jeopardy — Host Board</title>
+<link rel="icon" href="assets/img/peacock-logo.png">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@700;800&family=Libre+Franklin:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/host.css">
+</head>
+<body>
+<div class="host-root">
+
+  <!-- Score bar -->
+  <div class="score-bar">
+    <div class="score-bar__title">
+      <span class="score-bar__brand">CCS Student Gov</span>
+      <span class="score-bar__game">Jeopardy!</span>
+    </div>
+    <div class="score-bar__scores" id="scoreBar"></div>
+    <button class="buzzer-view-link" id="buzzerViewLink">Buzzer view →</button>
+  </div>
+
+  <!-- Board grid -->
+  <div class="board-grid" id="boardGrid"></div>
+
+  <!-- Join footer -->
+  <div class="join-footer">
+    <div class="join-footer__left">
+      <img class="join-footer__qr" id="qrCode" alt="Scan to join the buzzer">
+      <div class="join-footer__copy">
+        <span class="join-footer__headline">Scan to buzz in</span>
+        <span class="join-footer__sub">Open on your phone · enter your name · you're in</span>
+      </div>
+    </div>
+    <img class="join-footer__logo" src="assets/img/peacock-logo.png" alt="CCS Student Government peacock">
+  </div>
+
+  <!-- Question overlay -->
+  <div class="question-overlay" id="questionOverlay" hidden>
+    <img class="feather" id="feather" src="assets/img/peacock-logo.png" alt="">
+
+    <div class="question-content" id="questionContent">
+      <div class="q-badges">
+        <span class="q-badge__cat" id="aqCat"></span>
+        <span class="q-badge__value" id="aqValue"></span>
+      </div>
+
+      <div class="q-text" id="aqQuestion"></div>
+
+      <div class="buzz-banner" id="buzzBanner" hidden></div>
+
+      <div class="answer-box" id="answerBox" hidden>
+        <div class="answer-box__label">Answer</div>
+        <div class="answer-box__text" id="aqAnswer"></div>
+      </div>
+
+      <div class="q-controls" id="answerControls" hidden>
+        <button class="btn-correct" id="btnCorrect">✓ CORRECT</button>
+        <button class="btn-incorrect" id="btnIncorrect">✗ INCORRECT</button>
+        <button class="btn-skip" id="btnSkip">SKIP</button>
+      </div>
+
+      <div class="q-controls" id="preAnswerControls" hidden>
+        <button class="btn-simbuzz" id="btnSimBuzz">🎯 Simulate Buzz-In</button>
+        <button class="btn-reveal" id="btnReveal">REVEAL ANSWER</button>
+        <button class="btn-close" id="btnClose">CLOSE</button>
+      </div>
+      <div class="waiting-hint" id="waitingHint" hidden>Waiting for buzz-in, or reveal the answer directly</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/vendor/qrcode-generator.js"></script>
+<script type="module" src="js/host.js"></script>
+</body>
+</html>
