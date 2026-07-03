@@ -1,0 +1,82 @@
+/* CCS Student Government Jeopardy — shared design tokens
+   Values pulled directly from the Claude Design export
+   (CCS Jeopardy.dc.html). This is the source of truth —
+   do not eyeball colors/fonts from memory, read them from here. */
+
+@font-face {
+  font-family: 'AC Compacta';
+  src: url('../assets/fonts/AC-Compacta.ttf') format('truetype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  /* Colors */
+  --color-bg: #1a1a2e;
+  --color-bg-grid: #2a2a4a;
+  --color-footer: #131324;
+  --color-blue: #3C6CA8;
+  --color-yellow: #FFDE59;
+  --color-purple: #B78FD6;
+  --color-green: #5EB090;
+  --color-green-light: #ceeadb;
+  --color-green-text: #2d8a60;
+  --color-red: #c0506a;
+  --color-red-light: #FFC7EC;
+  --color-red-light-2: #ffdcea;
+  --color-red-text: #a0405a;
+  --color-tile-unrevealed: #FFFCF5;
+  --color-tile-border: #2a2a4a;
+  --color-skip-bg: #dedede;
+  --color-skip-text: #aaa;
+
+  /* Type */
+  --font-display: 'Alumni Sans SC', sans-serif;   /* dollar values, scores, numbers */
+  --font-callout: 'AC Compacta', sans-serif;      /* BUZZ IN, JEOPARDY!, buttons */
+  --font-body: 'Libre Franklin', sans-serif;       /* questions, answers, running text */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html, body {
+  height: 100%;
+  background: var(--color-bg);
+  font-family: var(--font-body);
+}
+
+button {
+  font-family: inherit;
+}
+
+@keyframes peacockReveal {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes buzzPop {
+  0%   { transform: scale(0.88); opacity: 0; }
+  55%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(183, 143, 214, 0.55); }
+  50%      { box-shadow: 0 0 0 20px rgba(183, 143, 214, 0); }
+}
+
+@keyframes correctFlash {
+  0%   { background: var(--color-green); }
+  100% { background: var(--color-green-light); }
+}
+
+@keyframes incorrectFlash {
+  0%   { background: var(--color-red-light); }
+  100% { background: var(--color-red-light-2); }
+}
