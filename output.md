@@ -152,3 +152,16 @@ it.
   lookalike ("Aka-AcidGR-Compacta"), not the commercial Fontfabric
   AC Compacta — noted in `README.md`. Fine for this training tool, swap
   later if you want the real font.
+
+## Commit, push, and deploy — 2026-07-03
+
+Committed all fixes (`b80698a`) and pushed to
+`origin/claude/ccs-jeopardy-game-1lczs9`. This branch is the repo's
+default branch (confirmed via `git remote show origin` — HEAD branch is
+`claude/ccs-jeopardy-game-1lczs9`, not `main`), and GitHub Pages was
+already enabled and live at
+`https://ajakeoo.github.io/student-government-jeopardy/` serving both
+`index.html` and `buzzer.html` with a 200 before this session even ended
+— no manual Pages setup needed. GitHub Pages rebuilds typically land
+within a minute or two of a push, so allow a short delay before the
+`playerId`/subcollection fix is live if you check immediately.
