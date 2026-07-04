@@ -34,10 +34,15 @@ const PLAYERS_COL = collection(db, 'rooms', 'main', 'players');
 export const HOST_HEARTBEAT_MS = 4000;
 export const HOST_TIMEOUT_MS = 10000;
 
+// How many buzz-ins we track (in order) per question, so the host can see
+// who came in 1st through 5th instead of just the winner.
+export const MAX_BUZZ_ORDER = 5;
+
 export const DEFAULT_ROOM = {
   board: {},
   currentTile: null,
   buzzLock: null,
+  buzzOrder: [],
   buzzToken: 0,
   hostSessionId: null,
   hostLastSeen: null,
@@ -113,6 +118,7 @@ export async function openQuestion(catIdx, rowIdx) {
       {
         currentTile: { catIdx, rowIdx, phase: 'feather' },
         buzzLock: null,
+        buzzOrder: [],
         buzzToken: (room.buzzToken || 0) + 1,
       },
       { merge: true }
@@ -147,7 +153,7 @@ export async function markResult(result) {
       playerSnap = await tx.get(playerRef);
     }
 
-    tx.set(ROOM_REF, { board, currentTile: null, buzzLock: null }, { merge: true });
+    tx.set(ROOM_REF, { board, currentTile: null, buzzLock: null, buzzOrder: [] }, { merge: true });
 
     if (playerRef) {
       const curScore = playerSnap.exists() ? playerSnap.data().score || 0 : 0;
@@ -158,7 +164,7 @@ export async function markResult(result) {
 }
 
 export async function closeQuestion() {
-  await updateDoc(ROOM_REF, { currentTile: null, buzzLock: null });
+  await updateDoc(ROOM_REF, { currentTile: null, buzzLock: null, buzzOrder: [] });
 }
 
 // ---- Player actions ----
@@ -167,17 +173,22 @@ export async function joinRoom(playerId, name) {
   await setDoc(doc(db, 'rooms', 'main', 'players', playerId), { name, score: 0 }, { merge: true });
 }
 
-// Race-safe: only the first transaction to commit while the tile is in
-// 'question' phase and buzzLock is unset actually wins. Also checks
-// buzzToken so a buzz queued from a just-closed question can't reactivate
-// a new one.
+// Race-safe: appends the caller to buzzOrder if the tile is in 'question'
+// phase, they haven't already buzzed, and fewer than MAX_BUZZ_ORDER people
+// have buzzed yet. buzzLock stays pinned to the first entry (whoever gets
+// to answer); buzzOrder is the full 1st-through-5th list the host sees.
+// Also checks buzzToken so a buzz queued from a just-closed question can't
+// reactivate a new one.
 export async function buzzIn(playerId, buzzToken) {
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ROOM_REF);
     if (!snap.exists()) return;
     const room = snap.data();
-    if (!room.currentTile || room.currentTile.phase !== 'question' || room.buzzLock) return;
+    if (!room.currentTile || room.currentTile.phase !== 'question') return;
     if (room.buzzToken !== buzzToken) return;
-    tx.set(ROOM_REF, { buzzLock: playerId }, { merge: true });
+    const order = room.buzzOrder || [];
+    if (order.includes(playerId) || order.length >= MAX_BUZZ_ORDER) return;
+    const nextOrder = [...order, playerId];
+    tx.set(ROOM_REF, { buzzOrder: nextOrder, buzzLock: room.buzzLock || nextOrder[0] }, { merge: true });
   });
 }
