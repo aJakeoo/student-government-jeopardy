@@ -1,4 +1,4 @@
-import { subscribeRoom, subscribePlayers, joinRoom, buzzIn, isHostActive } from './room.js';
+import { subscribeRoom, subscribePlayers, joinRoom, buzzIn, isHostActive, MAX_BUZZ_ORDER } from './room.js';
 
 const NAME_KEY = 'ccsSgJeopardyName';
 const PLAYER_ID_KEY = 'ccsSgJeopardyPlayerId';
@@ -79,7 +79,9 @@ nameInput.addEventListener('keydown', (e) => {
 buzzButton.addEventListener('click', () => {
   if (!latestRoom) return;
   const tile = latestRoom.currentTile;
-  if (!tile || tile.phase !== 'question' || latestRoom.buzzLock) return;
+  if (!tile || tile.phase !== 'question') return;
+  const order = latestRoom.buzzOrder || [];
+  if (order.includes(playerId) || order.length >= MAX_BUZZ_ORDER) return;
   buzzIn(playerId, latestRoom.buzzToken);
 });
 
@@ -126,15 +128,17 @@ function render() {
     waitingDisplay.hidden = false;
   }
 
-  const buzzedSelf = room.buzzLock === playerId;
-  const buzzedOther = !!room.buzzLock && !buzzedSelf;
-  const buzzerActive = !!tile && tile.phase === 'question' && !room.buzzLock;
-  const buzzedOtherName = buzzedOther && players[room.buzzLock] ? players[room.buzzLock].name : 'Someone';
+  const buzzOrder = room.buzzOrder || [];
+  const myRank = buzzOrder.indexOf(playerId); // -1 if not buzzed in
+  const buzzedSelf = myRank !== -1;
+  const buzzerFull = buzzOrder.length >= MAX_BUZZ_ORDER;
+  const buzzerActive = !!tile && tile.phase === 'question' && !buzzedSelf && !buzzerFull;
+  const firstName = buzzOrder.length && players[buzzOrder[0]] ? players[buzzOrder[0]].name : 'Someone';
 
   buzzButton.classList.remove('buzz-button--active', 'buzz-button--won', 'buzz-button--lost');
-  if (buzzedSelf) {
+  if (myRank === 0) {
     buzzButton.classList.add('buzz-button--won');
-  } else if (buzzedOther) {
+  } else if (buzzedSelf) {
     buzzButton.classList.add('buzz-button--lost');
   } else if (buzzerActive) {
     buzzButton.classList.add('buzz-button--active');
@@ -142,15 +146,17 @@ function render() {
   buzzButton.style.cursor = buzzerActive ? 'pointer' : 'default';
 
   buzzStatus.classList.remove('buzz-status--won', 'buzz-status--lost', 'buzz-status--active');
-  if (buzzedSelf) {
+  if (myRank === 0) {
     buzzStatus.classList.add('buzz-status--won');
     buzzStatus.textContent = '🎉 You buzzed first!';
-  } else if (buzzedOther) {
+  } else if (buzzedSelf) {
     buzzStatus.classList.add('buzz-status--lost');
-    buzzStatus.textContent = `${buzzedOtherName} got there first`;
+    buzzStatus.textContent = `You buzzed in — #${myRank + 1}, after ${firstName}`;
   } else if (buzzerActive) {
     buzzStatus.classList.add('buzz-status--active');
     buzzStatus.textContent = 'Tap to buzz in!';
+  } else if (buzzerFull) {
+    buzzStatus.textContent = `Buzzer closed — ${MAX_BUZZ_ORDER} players already in`;
   } else if (hasActiveQ) {
     buzzStatus.textContent = 'Get ready...';
   } else {

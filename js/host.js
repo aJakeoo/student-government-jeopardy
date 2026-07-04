@@ -26,6 +26,7 @@ const aqValue = document.getElementById('aqValue');
 const aqQuestion = document.getElementById('aqQuestion');
 const aqAnswer = document.getElementById('aqAnswer');
 const buzzBanner = document.getElementById('buzzBanner');
+const buzzOrderEl = document.getElementById('buzzOrder');
 const answerBox = document.getElementById('answerBox');
 const answerControls = document.getElementById('answerControls');
 const preAnswerControls = document.getElementById('preAnswerControls');
@@ -147,6 +148,25 @@ function renderQuestion(room, players) {
   const buzzedName = room.buzzLock ? (players[room.buzzLock] && players[room.buzzLock].name) : null;
   buzzBanner.hidden = !buzzedName;
   if (buzzedName) buzzBanner.textContent = `${buzzedName} BUZZES IN!`;
+
+  const buzzOrder = room.buzzOrder || [];
+  buzzOrderEl.hidden = buzzOrder.length === 0;
+  buzzOrderEl.innerHTML = '';
+  buzzOrder.forEach((playerId, idx) => {
+    const name = (players[playerId] && players[playerId].name) || 'Unknown';
+    const item = document.createElement('div');
+    item.className = 'buzz-order__item';
+    if (idx === 0) item.classList.add('buzz-order__item--first');
+    const rank = document.createElement('span');
+    rank.className = 'buzz-order__rank';
+    rank.textContent = idx + 1;
+    const nameEl = document.createElement('span');
+    nameEl.className = 'buzz-order__name';
+    nameEl.textContent = name;
+    item.appendChild(rank);
+    item.appendChild(nameEl);
+    buzzOrderEl.appendChild(item);
+  });
 
   const showAnswer = phase === 'answer';
   const showPreAnswer = phase === 'question';
