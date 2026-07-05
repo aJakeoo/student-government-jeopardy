@@ -16,7 +16,6 @@ import {
 const boardGrid = document.getElementById('boardGrid');
 const scoreBar = document.getElementById('scoreBar');
 const qrImg = document.getElementById('qrCode');
-const buzzerViewLink = document.getElementById('buzzerViewLink');
 
 const questionOverlay = document.getElementById('questionOverlay');
 const feather = document.getElementById('feather');
@@ -25,7 +24,6 @@ const aqCat = document.getElementById('aqCat');
 const aqValue = document.getElementById('aqValue');
 const aqQuestion = document.getElementById('aqQuestion');
 const aqAnswer = document.getElementById('aqAnswer');
-const buzzBanner = document.getElementById('buzzBanner');
 const buzzOrderEl = document.getElementById('buzzOrder');
 const answerBox = document.getElementById('answerBox');
 const answerControls = document.getElementById('answerControls');
@@ -48,9 +46,6 @@ function fmt(n) {
 
 // ---- QR code ----
 const buzzerUrl = new URL('buzzer.html', window.location.href).href;
-buzzerViewLink.addEventListener('click', () => {
-  window.location.href = 'buzzer.html';
-});
 
 (function renderQr() {
   const qr = qrcode(0, 'M');
@@ -144,10 +139,6 @@ function renderQuestion(room, players) {
 
   feather.classList.toggle('show', phase === 'feather');
   questionContent.classList.toggle('show', phase === 'question' || phase === 'answer');
-
-  const buzzedName = room.buzzLock ? (players[room.buzzLock] && players[room.buzzLock].name) : null;
-  buzzBanner.hidden = !buzzedName;
-  if (buzzedName) buzzBanner.textContent = `${buzzedName} BUZZES IN!`;
 
   const buzzOrder = room.buzzOrder || [];
   buzzOrderEl.hidden = buzzOrder.length === 0;
