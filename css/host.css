@@ -104,7 +104,7 @@
 
 .board-header__label {
   font-family: var(--font-display);
-  font-size: clamp(12px, 1.4vw, 19px);
+  font-size: clamp(15px, 1.9vw, 25px);
   color: white;
   text-transform: uppercase;
   letter-spacing: 0.04em;
