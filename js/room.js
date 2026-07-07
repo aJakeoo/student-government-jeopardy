@@ -1,5 +1,5 @@
 // Shared Firestore layer for the single game room. Both index.html (host)
-// and buzzer.html (player) import this — it's the only place that talks
+// and buzzer.html (player) import this: it's the only place that talks
 // to Firestore, so the read/write shape stays in one spot.
 //
 // Shape:
@@ -7,7 +7,7 @@
 //   rooms/main/players/{playerId} = { name, score }
 // Players are keyed by a per-device playerId (not name) so two people
 // with the same first name still get separate, individually-tracked
-// scores — the room doc alone can't (and shouldn't) enforce name
+// scores; the room doc alone can't (and shouldn't) enforce name
 // uniqueness at a live event.
 
 import { db } from './firebase-config.js';
@@ -25,7 +25,7 @@ import {
 const ROOM_REF = doc(db, 'rooms', 'main');
 const PLAYERS_COL = collection(db, 'rooms', 'main', 'players');
 
-// A host is only "live" while its tab is open and heartbeating — Firestore
+// A host is only "live" while its tab is open and heartbeating. Firestore
 // has no server-side disconnect hook (that's an RTDB-only feature), so
 // presence is approximated: the host writes hostLastSeen on an interval,
 // and anyone reading the room treats it as stale (host gone) once it's
@@ -67,7 +67,7 @@ function generateSessionId() {
 
 // The host board is the game's anchor: every time it loads (first open,
 // manual refresh, or reopening after being closed) it starts a brand new
-// session — wipes every player doc and resets the board/buzzer state, so
+// session: it wipes every player doc and resets the board/buzzer state, so
 // there's no stale "half-answered" game sitting around and no leftover
 // players from whoever was in the room before. Buzzer clients detect the
 // new hostSessionId and get bounced back to name entry.

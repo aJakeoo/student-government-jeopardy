@@ -84,7 +84,7 @@ function renderBoard(room) {
       if (isEmpty) {
         tile.classList.add('tile--empty');
         labelEl.classList.add('tile__label--result');
-        labelEl.textContent = '—';
+        labelEl.textContent = '–';
       } else if (result) {
         tile.classList.add('tile--answered', `tile--${result}`);
         labelEl.classList.add('tile__label--result');
@@ -191,9 +191,9 @@ btnClose.addEventListener('click', () => closeQuestion());
 
 // ---- Boot ----
 // The host board is the game's anchor: every load (first open, refresh,
-// or reopening after being closed) starts a fresh session — wipes all
-// players and resets the board so there's never a stale half-played game
-// or leftover players sitting in the room from before.
+// or reopening after being closed) starts a fresh session, wiping all
+// players and resetting the board so there's never a stale half-played
+// game or leftover players sitting in the room from before.
 await startHostSession();
 const heartbeatTimer = setInterval(sendHostHeartbeat, HOST_HEARTBEAT_MS);
 window.addEventListener('beforeunload', () => clearInterval(heartbeatTimer));
