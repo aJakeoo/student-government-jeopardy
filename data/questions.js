@@ -1,7 +1,7 @@
-// CCS Student Government Jeopardy — question bank
+// CCS Student Government Jeopardy: question bank
 // Sourced from CCS_SG_Jeopardy_Questions_Draft1.md.
 // Each category holds 5 clues at $100/$200/$300/$400/$500.
-// "Points of Order" has no drafted content yet — cells are flagged
+// "Points of Order" has no drafted content yet, so cells are flagged
 // `empty: true` so the host board can visibly skip/grey them out
 // instead of silently pretending there's content.
 
@@ -31,7 +31,7 @@ export const CATEGORIES = [
       },
       {
         value: 500,
-        question: 'This is who actually votes for the Executive Board — not the whole student body.',
+        question: 'This is who actually votes for the Executive Board, not the whole student body.',
         answer: 'What is the existing/outgoing Student Government Representatives?',
       },
     ],
@@ -47,7 +47,7 @@ export const CATEGORIES = [
       {
         value: 200,
         question: 'This is the difference between what a Representative and an Alternate owe their department, day to day.',
-        answer: 'What is: nothing, really — an Alternate has the same duty to represent department interests and must step into the Rep\'s tasks in their absence?',
+        answer: 'What is: nothing, really; an Alternate has the same duty to represent department interests and must step into the Rep\'s tasks in their absence?',
       },
       {
         value: 300,
@@ -61,7 +61,7 @@ export const CATEGORIES = [
       },
       {
         value: 500,
-        question: 'If a Rep gets dismissed, this is who takes over their seat first — before any new election happens.',
+        question: 'If a Rep gets dismissed, this is who takes over their seat first, before any new election happens.',
         answer: 'What is an Alternate from that same department?',
       },
     ],
@@ -86,7 +86,7 @@ export const CATEGORIES = [
       },
       {
         value: 400,
-        question: 'If the President is lost to graduation, resignation, or dismissal, this is what happens — no election required.',
+        question: 'If the President is lost to graduation, resignation, or dismissal, this is what happens: no election required.',
         answer: 'What is the Vice President automatically takes over?',
       },
       {
@@ -121,7 +121,7 @@ export const CATEGORIES = [
       },
       {
         value: 500,
-        question: 'A Committee Head can be forced to resign the same way a Representative can — name the vote threshold.',
+        question: 'A Committee Head can be forced to resign the same way a Representative can: name the vote threshold.',
         answer: 'What is a 3/4 vote?',
       },
     ],
@@ -141,7 +141,7 @@ export const CATEGORIES = [
       },
       {
         value: 300,
-        question: 'The Treasurer gives the budget update at this specific point in the meeting relative to funding proposals — and for a specific reason.',
+        question: 'The Treasurer gives the budget update at this specific point in the meeting relative to funding proposals, and for a specific reason.',
         answer: 'What is after proposals, once the proposing students have left the room (so the budget\'s status doesn\'t influence the proposal itself)?',
       },
       {
@@ -158,7 +158,7 @@ export const CATEGORIES = [
   },
   {
     name: 'Points\nof Order',
-    // No clues drafted yet — flagged so the board renders these tiles as
+    // No clues drafted yet; flagged so the board renders these tiles as
     // empty/unavailable instead of inventing content. Fill in `clues`
     // with 5 { value, question, answer } objects once content lands.
     empty: true,

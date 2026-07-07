@@ -26,7 +26,7 @@ function fmt(n) {
 
 function generatePlayerId() {
   // crypto.randomUUID() needs a secure context (HTTPS/localhost) and
-  // throws on plain-HTTP LAN testing, so fall back to a Math.random id —
+  // throws on plain-HTTP LAN testing, so fall back to a Math.random id;
   // this only needs to be unique per device, not cryptographically strong.
   if (window.crypto && typeof window.crypto.randomUUID === 'function') {
     return window.crypto.randomUUID();
@@ -43,7 +43,7 @@ if (!playerId) {
 }
 
 let playerName = localStorage.getItem(NAME_KEY) || '';
-// Which host game session this device last joined/knows about — used to
+// Which host game session this device last joined/knows about; used to
 // detect "the host started a new game" vs. "my own page just refreshed
 // mid-game", which need different treatment (rejoin from scratch vs.
 // silently resume).
@@ -90,7 +90,7 @@ function render() {
   const room = latestRoom;
   const players = latestPlayers;
 
-  // The host board wiped everyone and started fresh — anyone who was
+  // The host board wiped everyone and started fresh, so anyone who was
   // playing under the old session gets bounced back to name entry.
   if (room.hostSessionId !== knownHostSessionId) {
     knownHostSessionId = room.hostSessionId;
@@ -151,12 +151,12 @@ function render() {
     buzzStatus.textContent = '🎉 You buzzed first!';
   } else if (buzzedSelf) {
     buzzStatus.classList.add('buzz-status--lost');
-    buzzStatus.textContent = `You buzzed in — #${myRank + 1}, after ${firstName}`;
+    buzzStatus.textContent = `You buzzed in: #${myRank + 1}, after ${firstName}`;
   } else if (buzzerActive) {
     buzzStatus.classList.add('buzz-status--active');
     buzzStatus.textContent = 'Tap to buzz in!';
   } else if (buzzerFull) {
-    buzzStatus.textContent = `Buzzer closed — ${MAX_BUZZ_ORDER} players already in`;
+    buzzStatus.textContent = `Buzzer closed: ${MAX_BUZZ_ORDER} players already in`;
   } else if (hasActiveQ) {
     buzzStatus.textContent = 'Get ready...';
   } else {
