@@ -51,7 +51,7 @@ const buzzerUrl = new URL('buzzer.html', window.location.href).href;
   const qr = qrcode(0, 'M');
   qr.addData(buzzerUrl);
   qr.make();
-  qrImg.src = qr.createDataURL(6, 4);
+  qrImg.src = qr.createDataURL(9, 4);
 })();
 
 // ---- Board rendering ----
