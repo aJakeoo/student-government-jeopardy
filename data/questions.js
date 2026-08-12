@@ -1,38 +1,38 @@
 // CCS Student Government Jeopardy: question bank
-// Sourced from CCS_SG_Jeopardy_Questions_Draft1.md.
+// Sourced from "CCS SG Jeopardy Full Question Set" (all categories, $100-$500).
 // Each category holds 5 clues at $100/$200/$300/$400/$500.
-// "Points of Order" has no drafted content yet, so cells are flagged
-// `empty: true` so the host board can visibly skip/grey them out
-// instead of silently pretending there's content.
+// "Committees" has no drafted content in the current question set, so its
+// cells are flagged `empty: true` so the host board can visibly skip/grey
+// them out instead of silently pretending there's content.
 
 export const CATEGORIES = [
   {
-    name: 'Elections &\nNominations',
+    name: 'How We\nWork',
     clues: [
       {
         value: 100,
-        question: 'This many days nominees get to accept or decline their Department Representative nomination.',
-        answer: 'What is two (2) full days?',
+        question: 'Representatives must hold this many department-wide meetings each semester.',
+        answer: 'What is at least one department-wide meeting per semester?',
       },
       {
         value: 200,
-        question: 'This is the one thing every Letter of Intent has to include besides your name, pronouns, department, and year.',
-        answer: 'What is why you\'re running / your relevant experience / your goals? (any of the three counts)',
+        question: 'Representatives must meet with their Department Chair this often to discuss student concerns and share department feedback.',
+        answer: 'What is at least once every other month?',
       },
       {
         value: 300,
-        question: 'If a Department Representative election ends in a tie, this happens before anyone revotes.',
-        answer: 'What is a one-week postponement for more campaigning?',
+        question: 'When a department\'s Voting Representative is absent, this member may vote on the department\'s behalf.',
+        answer: 'Who is the Alternate Representative?',
       },
       {
         value: 400,
-        question: 'Unlike Department Rep elections, Executive Board candidates have to do this in front of everyone on Election Day before the ballot even opens.',
-        answer: 'What is give a short speech?',
+        question: 'When a Representative needs help with a department concern, the Constitution\'s usual support path starts with the department\'s Representatives and Alternates, then moves to the Executive Board, and reaches this person if the Executive Board needs additional guidance.',
+        answer: 'Who is the Student Government Advisor?',
       },
       {
         value: 500,
-        question: 'This is who actually votes for the Executive Board, not the whole student body.',
-        answer: 'What is the existing/outgoing Student Government Representatives?',
+        question: 'These are the Student Government meetings and assemblies members are expected to attend as part of their role.',
+        answer: 'What are regular Student Government meetings, committee meetings, Student Assembly, and applicable special meetings?',
       },
     ],
   },
@@ -41,23 +41,23 @@ export const CATEGORIES = [
     clues: [
       {
         value: 100,
-        question: 'This many meetings missed in a semester gets a Representative automatically dismissed.',
+        question: 'This many absences in one semester results in automatic attendance dismissal.',
         answer: 'What is four (4)?',
       },
       {
         value: 200,
-        question: 'This is the difference between what a Representative and an Alternate owe their department, day to day.',
-        answer: 'What is: nothing, really; an Alternate has the same duty to represent department interests and must step into the Rep\'s tasks in their absence?',
+        question: 'This is the Alternate Representative\'s specific voting responsibility when the department\'s primary Voting Representative is absent.',
+        answer: 'What is voting on behalf of the department?',
       },
       {
         value: 300,
-        question: 'Every Rep and Alternate has to do this "outlined in Article IX" whether they like it or not.',
-        answer: 'What is join a committee?',
+        question: 'Both Representatives and Alternates help carry out Student Government\'s work by serving on one of these four standing groups.',
+        answer: 'What is a Student Government committee?',
       },
       {
         value: 400,
-        question: 'Name one of the three narrow situations where missing a Student Government meeting actually counts as excused.',
-        answer: 'What is a conflicting department-wide meeting, a required academic trip, or a qualifying multi-day department trip? (any one counts)',
+        question: 'Name one type of required obligation that may count as an excused Student Government absence.',
+        answer: 'What is required Student Government business, a mandatory department-wide meeting, or a department-organized academic trip?',
       },
       {
         value: 500,
@@ -81,7 +81,7 @@ export const CATEGORIES = [
       },
       {
         value: 300,
-        question: 'This officer runs the Instagram, the Peacock Pride page, and checks posters for mistakes before they go up.',
+        question: 'This Executive Board member leads Student Government communications and engagement, manages its Instagram and Peacock Pride presence, promotes initiatives, and helps students learn how to get involved.',
         answer: 'Who is the Outreach Manager?',
       },
       {
@@ -98,32 +98,17 @@ export const CATEGORIES = [
   },
   {
     name: 'Committees',
+    // No clues drafted in the current question set; flagged so the board
+    // renders these tiles as empty/unavailable instead of inventing content.
+    // Fill in `clues` with 5 { value, question, answer } objects once
+    // content lands.
+    empty: true,
     clues: [
-      {
-        value: 100,
-        question: 'This is the number of standing committees Student Government runs.',
-        answer: 'What is four (4)?',
-      },
-      {
-        value: 200,
-        question: 'Dining, sustainability, building maintenance, and studio/lab access all live under this committee.',
-        answer: 'What is Facilities?',
-      },
-      {
-        value: 300,
-        question: 'This committee handles ADA/Title IX referrals, accessibility for working students, and support for international and parent students.',
-        answer: 'What is Diversity, Equity, and Inclusion?',
-      },
-      {
-        value: 400,
-        question: 'Alternates can join a committee, but they cannot run for this specific role within one.',
-        answer: 'What is Committee Head?',
-      },
-      {
-        value: 500,
-        question: 'A Committee Head can be forced to resign the same way a Representative can: name the vote threshold.',
-        answer: 'What is a 3/4 vote?',
-      },
+      { value: 100, empty: true },
+      { value: 200, empty: true },
+      { value: 300, empty: true },
+      { value: 400, empty: true },
+      { value: 500, empty: true },
     ],
   },
   {
@@ -136,8 +121,8 @@ export const CATEGORIES = [
       },
       {
         value: 200,
-        question: 'Historically, this is roughly how much per student the Student Government budget draws from tuition, up to a cap.',
-        answer: 'What is $5 per student, up to $18,000?',
+        question: 'This is what happens to unused Student Government funds at the end of the academic year.',
+        answer: 'What is roll over to the next academic year?',
       },
       {
         value: 300,
@@ -146,8 +131,8 @@ export const CATEGORIES = [
       },
       {
         value: 400,
-        question: 'This is how many Representatives it takes to call a special meeting through the President.',
-        answer: 'What is three (3)?',
+        question: 'Within one month of receiving funding approval, students or RSOs submit itemized receipts to this person and copy Student Government so the award can be tracked.',
+        answer: 'Who is their Program Manager or Advisor, with studentgov@ccsdetroit.edu copied?',
       },
       {
         value: 500,
@@ -157,17 +142,33 @@ export const CATEGORIES = [
     ],
   },
   {
-    name: 'Points\nof Order',
-    // No clues drafted yet; flagged so the board renders these tiles as
-    // empty/unavailable instead of inventing content. Fill in `clues`
-    // with 5 { value, question, answer } objects once content lands.
-    empty: true,
+    name: 'Funding in\nPractice',
     clues: [
-      { value: 100, empty: true },
-      { value: 200, empty: true },
-      { value: 300, empty: true },
-      { value: 400, empty: true },
-      { value: 500, empty: true },
+      {
+        value: 100,
+        question: 'In addition to individual students and groups of students, these recognized campus groups may apply for Student Government project funding.',
+        answer: 'What are Registered Student Organizations, or RSOs, in good standing?',
+      },
+      {
+        value: 200,
+        question: 'This is the maximum length of the applicant\'s funding proposal presentation before the five-minute question-and-answer period.',
+        answer: 'What is five minutes?',
+      },
+      {
+        value: 300,
+        question: 'Representatives use this tool to guide discussion about a participant\'s preparation, budget, proposal, previous work, and need, but not to calculate a numerical score.',
+        answer: 'What is the funding rubric?',
+      },
+      {
+        value: 400,
+        question: 'Even when Student Government approves a proposal, the award may be this instead of the full amount requested.',
+        answer: 'What is partial funding?',
+      },
+      {
+        value: 500,
+        question: 'Under the ranked-choice funding process, this is the formula used to determine how many proposed funding amounts each Voting Representative may select.',
+        answer: 'What is half the number of proposed funding amounts, rounded up? (For example, five proposed amounts give each Voting Representative three selections.)',
+      },
     ],
   },
 ];
