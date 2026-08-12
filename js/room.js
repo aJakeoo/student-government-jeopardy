@@ -18,7 +18,6 @@ import {
   onSnapshot,
   runTransaction,
   updateDoc,
-  setDoc,
   writeBatch,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
@@ -169,8 +168,21 @@ export async function closeQuestion() {
 
 // ---- Player actions ----
 
+// Called on join and again on every page load that resumes an existing
+// session, so it must not clobber a score already earned: `merge: true`
+// merges the document but still overwrites whatever fields it's handed,
+// so passing a literal `score: 0` here would reset a returning player to
+// zero on refresh. Read-then-write keeps the existing score and only
+// defaults to 0 for a genuinely new player. (Players are deleted
+// wholesale by startHostSession, so a new game still starts everyone
+// at 0.)
 export async function joinRoom(playerId, name) {
-  await setDoc(doc(db, 'rooms', 'main', 'players', playerId), { name, score: 0 }, { merge: true });
+  const ref = doc(db, 'rooms', 'main', 'players', playerId);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const score = snap.exists() ? snap.data().score || 0 : 0;
+    tx.set(ref, { name, score }, { merge: true });
+  });
 }
 
 // Race-safe: appends the caller to buzzOrder if the tile is in 'question'

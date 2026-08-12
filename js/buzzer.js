@@ -98,6 +98,9 @@ function render() {
     playerName = '';
     hasJoinedThisSession = false;
     localStorage.removeItem(NAME_KEY);
+    // Don't leave the previous game's name sitting in the box for whoever
+    // picks this phone up next.
+    nameInput.value = '';
   }
 
   const hostActive = isHostActive(room);
@@ -182,6 +185,22 @@ function render() {
 }
 
 showScreenForState(false);
+
+// isHostActive() is a clock check against the last heartbeat, but render()
+// otherwise only runs when a Firestore snapshot arrives. When the host tab
+// simply goes away it stops writing, so no snapshot ever comes and nothing
+// re-evaluates staleness: the player would sit on a live-looking game
+// screen indefinitely. Poll the clock as well, and only re-render on an
+// actual change so the leaderboard isn't rebuilt every tick.
+let lastHostActive = null;
+setInterval(() => {
+  if (!latestRoom) return;
+  const active = isHostActive(latestRoom);
+  if (active === lastHostActive) return;
+  lastHostActive = active;
+  render();
+}, 2000);
+
 subscribeRoom((room) => {
   latestRoom = room;
   render();
