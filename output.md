@@ -220,3 +220,74 @@ host board, open a buzzer tab and join, close the host tab, confirm the
 buzzer flips to "Waiting for the host" within ~10s, then reopen the host
 board and confirm the buzzer is forced back to name entry with a clean
 board.
+
+## Question set update + QA loop — 2026-08-12
+
+Replaced the question bank with the finalized set from "CCS SG Jeopardy
+Full Question Set" (PDF). Category changes:
+
+- `Elections & Nominations` -> `How We Work`, with entirely new clues
+  (department-wide meetings, Department Chair cadence, alternate voting,
+  the support path up to the Advisor, expected meetings).
+- `Points of Order` -> `Funding in Practice`, and it is no longer a
+  placeholder: five real clues on RSO eligibility, the five-minute
+  presentation cap, the funding rubric, partial awards, and the
+  ranked-choice selection formula.
+- **`Committees` is now the empty one.** The source document has the
+  header with no table under it, so it inherits the `empty: true`
+  treatment and its five previous clues were dropped. Confirmed this is
+  the document's actual state, not a text-extraction failure. If that
+  was not intended, that section of the source doc needs refilling and
+  this is the only place to fix it.
+
+`Reps & Alternates`, `Executive Board`, and `Money & Motions` kept their
+names, but several clues were reworded or replaced outright. Em dashes in
+the source copy were converted to plain punctuation per the convention
+set in d413443.
+
+All 25 clues were then diffed programmatically against text extracted
+from the PDF (normalizing smart quotes, dashes, and whitespace): zero
+mismatches, and category names/order match the document.
+
+### QA loop
+
+Ran headless (Puppeteer against the local Firestore emulator) rather than
+by hand, so the whole board could actually be played: host board plus
+three buzzer clients, each in its own storage partition because
+`buzzer.js` keys identity off `localStorage` and a shared context makes
+player 2 inherit player 1's name.
+
+Played all 25 live clues end to end (open, buzz, reveal, mark), plus a
+worst-case layout pass on the six longest clues with a full five-deep
+buzz order and long names. No layout clipping or overflow at 1280x800,
+the empty `Committees` column is correctly inert, and the buzzer caps at
+five with the sixth player told the buzzer is closed.
+
+**Two pre-existing bugs surfaced and were fixed** (both in the
+host-presence work flagged in the previous entry as never manually
+tested; neither is related to the question update):
+
+1. **A player refreshing their phone lost their entire score.**
+   `joinRoom` wrote `{ name, score: 0 }` with `merge: true` and
+   `buzzer.js` calls it on every load that resumes a session. `merge`
+   merges the document but still overwrites the fields it is handed, so
+   the literal `score: 0` reset returning players. Confirmed on the host
+   board (`Rosa $100` -> `Rosa $0` on reload). Now a transaction that
+   reads the existing score and only defaults to 0 for a new player; a
+   new game still zeroes everyone because `startHostSession` deletes the
+   player docs outright.
+
+2. **The buzzer never noticed the host disappearing.** `isHostActive()`
+   is a clock check against the last heartbeat, but `render()` only ran
+   on a Firestore snapshot. When the host tab closes it stops writing, so
+   no snapshot arrives and nothing re-evaluates staleness: players sat on
+   a live-looking game screen indefinitely (verified still showing the
+   game 15s after the host closed, with a 10s timeout). Added a 2s clock
+   poll that re-renders only when host-active actually flips.
+
+Also cleared the name field when a session resets, so the previous game's
+name is not sitting in the box for whoever picks the phone up next.
+
+After the fixes all three suites pass clean: full 25-clue playthrough,
+worst-case layout stress, and a presence suite covering host-closes,
+host-reopens, and player-refreshes-mid-game.
