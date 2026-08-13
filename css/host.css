@@ -492,3 +492,279 @@
   text-align: center;
   margin-top: -8px;
 }
+
+/* ---- Win screen ----
+   Geometry and color pulled from the Claude Design export's Game Over
+   overlay; sizes that were literal px there are kept literal here, and
+   the ones that were clamp() stay responsive the same way. */
+
+.win-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow: hidden;
+}
+
+.win-overlay[hidden] {
+  display: none;
+}
+
+/* Oversized, barely-there peacock sitting behind the results. */
+.win-overlay__backdrop {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  transform: translate(-50%, -50%);
+  height: 34%;
+  width: auto;
+  opacity: 0.14;
+  pointer-events: none;
+  filter: drop-shadow(0 0 30px rgba(255, 222, 89, 0.3));
+}
+
+.win-overlay__logo {
+  position: absolute;
+  bottom: 16px;
+  right: 18px;
+  height: 56px;
+  opacity: 0.5;
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti__piece {
+  position: absolute;
+  top: -10px;
+  opacity: 0.85;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.win-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  z-index: 1;
+}
+
+.win-title {
+  font-family: var(--font-callout);
+  font-size: clamp(38px, 6vw, 84px);
+  color: var(--color-yellow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 4px 24px rgba(255, 222, 89, 0.35);
+}
+
+.podium-first {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 222, 89, 0.12);
+  border: 2px solid var(--color-yellow);
+  border-radius: 20px;
+  padding: 22px 56px;
+}
+
+.podium-first[hidden],
+.podium-second[hidden],
+.podium-third[hidden],
+.win-rest[hidden] {
+  display: none;
+}
+
+.podium-first__label {
+  font-family: var(--font-callout);
+  font-size: 16px;
+  color: var(--color-yellow);
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+
+.podium-first__name {
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 52px);
+  color: var(--color-yellow);
+  line-height: 1.1;
+}
+
+.podium-first__score {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 36px);
+  color: white;
+  font-weight: 700;
+}
+
+.podium-row {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.podium-second,
+.podium-third {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-radius: 16px;
+  padding: 14px 32px;
+}
+
+.podium-second {
+  background: rgba(183, 143, 214, 0.14);
+  border: 2px solid var(--color-purple);
+}
+
+.podium-third {
+  background: rgba(183, 143, 214, 0.08);
+  border: 2px solid rgba(183, 143, 214, 0.6);
+}
+
+.podium-second__label {
+  font-family: var(--font-callout);
+  font-size: 12px;
+  color: var(--color-purple);
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+}
+
+.podium-second__name {
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: 22px;
+  color: white;
+}
+
+.podium-second__score {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-purple);
+  font-weight: 700;
+}
+
+.podium-third__label {
+  font-family: var(--font-callout);
+  font-size: 12px;
+  color: rgba(183, 143, 214, 0.85);
+  letter-spacing: 0.14em;
+}
+
+.podium-third__name {
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.podium-third__score {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: rgba(183, 143, 214, 0.85);
+  font-weight: 700;
+}
+
+.win-rest {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.win-rest__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 4px 10px;
+}
+
+.win-rest__name {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.win-rest__score {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---- Claude attribution ----
+   Hover (or keyboard focus) reveals the credit. */
+.attribution {
+  position: absolute;
+  bottom: 20px;
+  left: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  opacity: 0.55;
+  transition: opacity 0.18s;
+  cursor: default;
+  z-index: 2;
+}
+
+.attribution:hover,
+.attribution:focus-visible {
+  opacity: 1;
+}
+
+.attribution__mark {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.attribution__tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  background: var(--color-tile-unrevealed);
+  color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  padding: 10px 15px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid var(--color-purple);
+  animation: buzzPop 0.22s ease both;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.attribution__tooltip[hidden] {
+  display: none;
+}
+
+.attribution[hidden] {
+  display: none;
+}

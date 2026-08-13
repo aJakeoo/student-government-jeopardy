@@ -71,6 +71,45 @@
     </div>
   </div>
 
+  <!-- Win screen: shown once every playable tile has been resolved -->
+  <div class="win-overlay" id="winOverlay" hidden>
+    <img class="win-overlay__backdrop" src="assets/img/peacock-logo.png" alt="">
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+    <div class="win-stack">
+      <div class="win-title">GAME OVER</div>
+
+      <div class="podium-first" id="podiumFirst" hidden>
+        <span class="podium-first__label">1ST PLACE</span>
+        <span class="podium-first__name" id="firstName"></span>
+        <span class="podium-first__score" id="firstScore"></span>
+      </div>
+
+      <div class="podium-row">
+        <div class="podium-second" id="podiumSecond" hidden>
+          <span class="podium-second__label">2ND PLACE</span>
+          <span class="podium-second__name" id="secondName"></span>
+          <span class="podium-second__score" id="secondScore"></span>
+        </div>
+        <div class="podium-third" id="podiumThird" hidden>
+          <span class="podium-third__label">3RD PLACE</span>
+          <span class="podium-third__name" id="thirdName"></span>
+          <span class="podium-third__score" id="thirdScore"></span>
+        </div>
+      </div>
+
+      <div class="win-rest" id="winRest" hidden></div>
+    </div>
+
+    <img class="win-overlay__logo" src="assets/img/peacock-logo.png" alt="CCS Student Government peacock">
+
+    <!-- Claude attribution -->
+    <div class="attribution" id="attribution">
+      <img class="attribution__mark" src="assets/img/claude-attribution.png" alt="Made by Claude and Jake Juip">
+      <div class="attribution__tooltip" id="attributionTooltip" hidden>This game was made by Claude and Jake Juip.</div>
+    </div>
+  </div>
+
 </div>
 
 <script src="js/vendor/qrcode-generator.js"></script>

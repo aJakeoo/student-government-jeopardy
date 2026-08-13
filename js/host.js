@@ -36,8 +36,31 @@ const btnSkip = document.getElementById('btnSkip');
 const btnReveal = document.getElementById('btnReveal');
 const btnClose = document.getElementById('btnClose');
 
+const winOverlay = document.getElementById('winOverlay');
+const confettiEl = document.getElementById('confetti');
+const podiumFirst = document.getElementById('podiumFirst');
+const podiumSecond = document.getElementById('podiumSecond');
+const podiumThird = document.getElementById('podiumThird');
+const firstNameEl = document.getElementById('firstName');
+const firstScoreEl = document.getElementById('firstScore');
+const secondNameEl = document.getElementById('secondName');
+const secondScoreEl = document.getElementById('secondScore');
+const thirdNameEl = document.getElementById('thirdName');
+const thirdScoreEl = document.getElementById('thirdScore');
+const winRest = document.getElementById('winRest');
+const attribution = document.getElementById('attribution');
+const attributionTooltip = document.getElementById('attributionTooltip');
+
 let latestRoom = null;
 let latestPlayers = {};
+
+// Total tiles that can actually be played. Categories flagged `empty`
+// have no content, so they can never be resolved and must not count
+// toward "the board is finished".
+const PLAYABLE_TILES = CATEGORIES.reduce(
+  (n, cat) => n + cat.clues.filter((clue) => !clue.empty).length,
+  0
+);
 
 function fmt(n) {
   const v = n ?? 0;
@@ -171,11 +194,170 @@ function renderQuestion(room, players) {
   waitingHint.hidden = !showPreAnswer;
 }
 
+// ---- Win screen ----
+// The board is finished once every playable tile has a result. Scores
+// count up from zero when the screen first appears, so the final
+// standings land with some weight instead of just being printed.
+const WIN_COUNTUP_MS = 1100;
+const CONFETTI_COUNT = 26;
+const CONFETTI_COLORS = ['#FFDE59', '#B78FD6', '#5EB090', '#FFC7EC'];
+
+let winShown = false;
+let countUpFrame = null;
+let countUpStart = null;
+// The standings the win screen should be drawing. Kept in a variable
+// rather than closed over by the count-up, because the last question's
+// score write usually lands in a *later* snapshot than the board write
+// that ends the game: closing over the array read at trigger time would
+// freeze the winner's total one question short.
+let winRanked = [];
+
+function isBoardComplete(room) {
+  const results = Object.values(room.board || {}).filter(Boolean);
+  return PLAYABLE_TILES > 0 && results.length >= PLAYABLE_TILES;
+}
+
+function buildConfetti() {
+  confettiEl.innerHTML = '';
+  // Deterministic spread rather than Math.random(): the same pleasant
+  // distribution every time, and no reflow-dependent surprises.
+  for (let i = 0; i < CONFETTI_COUNT; i++) {
+    const size = 6 + (i % 4) * 3;
+    const piece = document.createElement('div');
+    piece.className = 'confetti__piece';
+    piece.style.left = `${(i * 37) % 100}%`;
+    piece.style.width = `${size}px`;
+    piece.style.height = `${size * 1.6}px`;
+    piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    piece.style.animation = `confettiFall ${2.6 + (i % 5) * 0.4}s linear ${(i % 13) * 0.18}s infinite`;
+    confettiEl.appendChild(piece);
+  }
+}
+
+function paintPodium(ranked, progress) {
+  const at = (idx) => {
+    if (!ranked[idx]) return null;
+    const [name, score] = ranked[idx];
+    return { name, score: Math.round(score * progress) };
+  };
+
+  const first = at(0);
+  podiumFirst.hidden = !first;
+  if (first) {
+    firstNameEl.textContent = first.name;
+    firstScoreEl.textContent = fmt(first.score);
+  }
+
+  const second = at(1);
+  podiumSecond.hidden = !second;
+  if (second) {
+    secondNameEl.textContent = second.name;
+    secondScoreEl.textContent = fmt(second.score);
+  }
+
+  const third = at(2);
+  podiumThird.hidden = !third;
+  if (third) {
+    thirdNameEl.textContent = third.name;
+    thirdScoreEl.textContent = fmt(third.score);
+  }
+
+  const rest = ranked.slice(3);
+  winRest.hidden = rest.length === 0;
+  winRest.innerHTML = '';
+  rest.forEach(([name, score], idx) => {
+    const row = document.createElement('div');
+    row.className = 'win-rest__row';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'win-rest__name';
+    nameEl.textContent = `${idx + 4}. ${name}`;
+    const scoreEl = document.createElement('span');
+    scoreEl.className = 'win-rest__score';
+    scoreEl.textContent = fmt(Math.round(score * progress));
+    row.appendChild(nameEl);
+    row.appendChild(scoreEl);
+    winRest.appendChild(row);
+  });
+}
+
+function renderWin(room, players) {
+  const complete = isBoardComplete(room);
+
+  if (!complete) {
+    // Reset so a fresh session can play the reveal again.
+    winOverlay.hidden = true;
+    if (winShown) {
+      winShown = false;
+      countUpStart = null;
+      if (countUpFrame) cancelAnimationFrame(countUpFrame);
+      countUpFrame = null;
+      confettiEl.innerHTML = '';
+    }
+    return;
+  }
+
+  winRanked = Object.values(players)
+    .map((p) => [p.name, p.score || 0])
+    .sort((a, b) => b[1] - a[1]);
+
+  winOverlay.hidden = false;
+
+  if (!winShown) {
+    winShown = true;
+    buildConfetti();
+    countUpStart = performance.now();
+    const tick = (now) => {
+      const p = Math.min(1, (now - countUpStart) / WIN_COUNTUP_MS);
+      const eased = 1 - Math.pow(1 - p, 3);
+      paintPodium(winRanked, eased);
+      if (p < 1) {
+        countUpFrame = requestAnimationFrame(tick);
+      } else {
+        countUpFrame = null;
+        // Settle on whatever the latest snapshot says, so a score that
+        // arrived during the animation isn't left rounded to the old total.
+        paintPodium(winRanked, 1);
+      }
+    };
+    countUpFrame = requestAnimationFrame(tick);
+    return;
+  }
+
+  // Already counted up: a later snapshot (the final award landing, a
+  // player doc arriving late) repaints at full value rather than
+  // restarting the animation.
+  if (!countUpFrame) paintPodium(winRanked, 1);
+}
+
+attribution.addEventListener('mouseenter', () => {
+  attributionTooltip.hidden = false;
+});
+attribution.addEventListener('mouseleave', () => {
+  attributionTooltip.hidden = true;
+});
+
+// If the mark can't load, drop the whole badge rather than leave a
+// broken-image icon sitting on a projector at the end of a game. This
+// module is deferred, so the image has usually already resolved (or
+// failed) by the time we get here: check the settled state as well as
+// listening, or a failure that happened during parsing is missed.
+const attributionMark = attribution.querySelector('.attribution__mark');
+function hideAttributionIfBroken() {
+  if (attributionMark.complete && attributionMark.naturalWidth === 0) {
+    attribution.hidden = true;
+  }
+}
+attributionMark.addEventListener('error', () => {
+  attribution.hidden = true;
+});
+hideAttributionIfBroken();
+
 function renderAll() {
   if (!latestRoom) return;
   renderBoard(latestRoom);
   renderScores(latestPlayers);
   renderQuestion(latestRoom, latestPlayers);
+  renderWin(latestRoom, latestPlayers);
 }
 
 // ---- Host actions ----

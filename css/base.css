@@ -81,3 +81,9 @@ button {
   0%   { background: var(--color-red-light); }
   100% { background: var(--color-red-light-2); }
 }
+
+@keyframes confettiFall {
+  from { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(400deg); opacity: 0.9; }
+}

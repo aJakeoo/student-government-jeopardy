@@ -33,6 +33,16 @@
       <button class="join-screen__button" id="joinButton">JOIN</button>
     </div>
 
+    <!-- Shown once the host board has been fully played out -->
+    <div class="player-over" id="playerOverScreen" hidden>
+      <div class="player-over__title">Game Over</div>
+      <div class="player-over__sub">Thanks for playing!</div>
+      <div class="player-over__card">
+        <span class="player-over__rank" id="playerOverRank"></span>
+        <span class="player-over__score" id="playerOverScore"></span>
+      </div>
+    </div>
+
     <!-- Game screen -->
     <div class="game-screen" id="gameScreen" hidden>
       <div class="game-screen__header">

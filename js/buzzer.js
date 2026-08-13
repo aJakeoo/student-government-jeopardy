@@ -1,4 +1,12 @@
 import { subscribeRoom, subscribePlayers, joinRoom, buzzIn, isHostActive, MAX_BUZZ_ORDER } from './room.js';
+import { CATEGORIES } from '../data/questions.js';
+
+// Mirrors the host's completion rule: only clues with real content can
+// ever be resolved, so only those count toward finishing the board.
+const PLAYABLE_TILES = CATEGORIES.reduce(
+  (n, cat) => n + cat.clues.filter((clue) => !clue.empty).length,
+  0
+);
 
 const NAME_KEY = 'ccsSgJeopardyName';
 const PLAYER_ID_KEY = 'ccsSgJeopardyPlayerId';
@@ -13,6 +21,9 @@ const nameInput = document.getElementById('nameInput');
 const joinButton = document.getElementById('joinButton');
 
 const gameScreen = document.getElementById('gameScreen');
+const playerOverScreen = document.getElementById('playerOverScreen');
+const playerOverRank = document.getElementById('playerOverRank');
+const playerOverScore = document.getElementById('playerOverScore');
 const valueDisplay = document.getElementById('valueDisplay');
 const waitingDisplay = document.getElementById('waitingDisplay');
 const buzzButton = document.getElementById('buzzButton');
@@ -52,11 +63,25 @@ let hasJoinedThisSession = false;
 let latestRoom = null;
 let latestPlayers = {};
 
-function showScreenForState(hostActive) {
+function showScreenForState(hostActive, gameOver = false) {
   const hasName = !!playerName;
+  const playing = hostActive && hasName;
   hostGoneScreen.hidden = hostActive;
   joinScreen.hidden = !hostActive || hasName;
-  gameScreen.hidden = !hostActive || !hasName;
+  gameScreen.hidden = !playing || gameOver;
+  playerOverScreen.hidden = !playing || !gameOver;
+}
+
+function isBoardComplete(room) {
+  const results = Object.values(room.board || {}).filter(Boolean);
+  return PLAYABLE_TILES > 0 && results.length >= PLAYABLE_TILES;
+}
+
+function ordinal(n) {
+  if (n === 1) return '1st';
+  if (n === 2) return '2nd';
+  if (n === 3) return '3rd';
+  return `${n}th`;
 }
 
 async function doJoin() {
@@ -104,7 +129,8 @@ function render() {
   }
 
   const hostActive = isHostActive(room);
-  showScreenForState(hostActive);
+  const gameOver = isBoardComplete(room);
+  showScreenForState(hostActive, gameOver);
   if (!hostActive) return;
 
   // Re-establish our player doc once per session (covers this device's
@@ -118,6 +144,16 @@ function render() {
 
   statusName.textContent = playerName;
   statusScore.textContent = fmt(me && me.score);
+
+  if (gameOver) {
+    const ranked = Object.entries(players).sort(
+      ([, a], [, b]) => (b.score || 0) - (a.score || 0)
+    );
+    const myRank = ranked.findIndex(([id]) => id === playerId) + 1;
+    playerOverRank.textContent = myRank > 0 ? `You came in ${ordinal(myRank)}!` : '';
+    playerOverScore.textContent = fmt(me && me.score);
+    return;
+  }
 
   const tile = room.currentTile;
   const hasActiveQ = !!tile;

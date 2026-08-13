@@ -312,3 +312,61 @@
   color: var(--color-blue);
   font-weight: 700;
 }
+
+/* ---- Player game-over ----
+   Mirrors the host win screen on the phone: the design's player-side
+   Game Over panel, on the cream phone card rather than the dark board. */
+.player-over {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 28px;
+  text-align: center;
+}
+
+.player-over[hidden] {
+  display: none;
+}
+
+.player-over__title {
+  font-family: var(--font-callout);
+  font-size: 26px;
+  color: var(--color-blue);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.player-over__sub {
+  font-size: 14px;
+  color: #888;
+  font-weight: 500;
+}
+
+.player-over__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--color-tile-unrevealed);
+  border: 2px solid var(--color-yellow);
+  border-radius: 16px;
+  padding: 18px 34px;
+  margin-top: 6px;
+}
+
+.player-over__rank {
+  font-family: var(--font-callout);
+  font-size: 14px;
+  color: #c9a300;
+  letter-spacing: 0.1em;
+}
+
+.player-over__score {
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: var(--color-blue);
+  font-weight: 700;
+}
