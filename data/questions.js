@@ -1,9 +1,13 @@
 // CCS Student Government Jeopardy: question bank
 // Sourced from "CCS SG Jeopardy Full Question Set" (all categories, $100-$500).
 // Each category holds 5 clues at $100/$200/$300/$400/$500.
-// "Committees" has no drafted content in the current question set, so its
-// cells are flagged `empty: true` so the host board can visibly skip/grey
-// them out instead of silently pretending there's content.
+//
+// The board sizes itself to however many categories are listed here, so
+// adding or removing one needs no other change. A category with no
+// drafted content yet can be flagged `empty: true` (with each clue also
+// flagged) and the host board will grey its tiles out and make them
+// unclickable rather than pretend there's content; nothing uses that
+// today.
 
 export const CATEGORIES = [
   {
@@ -94,21 +98,6 @@ export const CATEGORIES = [
         question: 'Every Executive Board member is also secretly doing this second job the whole time.',
         answer: 'What is serving as a voting Representative for their own department?',
       },
-    ],
-  },
-  {
-    name: 'Committees',
-    // No clues drafted in the current question set; flagged so the board
-    // renders these tiles as empty/unavailable instead of inventing content.
-    // Fill in `clues` with 5 { value, question, answer } objects once
-    // content lands.
-    empty: true,
-    clues: [
-      { value: 100, empty: true },
-      { value: 200, empty: true },
-      { value: 300, empty: true },
-      { value: 400, empty: true },
-      { value: 500, empty: true },
     ],
   },
   {

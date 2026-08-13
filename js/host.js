@@ -57,6 +57,9 @@ const buzzerUrl = new URL('buzzer.html', window.location.href).href;
 // ---- Board rendering ----
 function renderBoard(room) {
   boardGrid.innerHTML = '';
+  // Keep the grid as wide as the question bank, so adding or dropping a
+  // category is a data-only change.
+  boardGrid.style.setProperty('--board-cols', CATEGORIES.length);
 
   CATEGORIES.forEach((cat) => {
     const header = document.createElement('div');

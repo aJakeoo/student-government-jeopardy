@@ -85,7 +85,9 @@
 .board-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  /* Column count comes from the question bank at render time (host.js sets
+     --board-cols); the fallback only matters if that hasn't run yet. */
+  grid-template-columns: repeat(var(--board-cols, 5), 1fr);
   grid-template-rows: 104px repeat(5, 1fr);
   gap: 3px;
   padding: 3px;

@@ -291,3 +291,25 @@ name is not sitting in the box for whoever picks the phone up next.
 After the fixes all three suites pass clean: full 25-clue playthrough,
 worst-case layout stress, and a presence suite covering host-closes,
 host-reopens, and player-refreshes-mid-game.
+
+## Committees dropped from the board — 2026-08-12
+
+Per follow-up: Committees is not shown at all, rather than rendered as a
+greyed-out placeholder column. The board is now five categories / 25
+tiles.
+
+The grid's column count was hardcoded to `repeat(6, 1fr)` in `host.css`,
+which would have left a trailing empty column. `renderBoard` now sets a
+`--board-cols` custom property from `CATEGORIES.length` and the CSS reads
+that, so the category count is data-driven and this can't drift again.
+
+Kept the `empty: true` rendering path even though nothing uses it now; it
+is how an undrafted category degrades, and this question set has already
+needed it once.
+
+Re-ran all four suites after the change: 25 clues played end to end, zero
+layout problems at worst-case text with a five-deep buzz order, and the
+presence/reset suite still fully green. The only flagged items were the
+known intermittent 400 on the emulator's `documents:commit` under
+concurrent buzzes, which the SDK retries and which predates these
+changes.
